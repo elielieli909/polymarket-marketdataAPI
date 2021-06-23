@@ -1,15 +1,5 @@
 const express = require('express');
 const handlers = require('./handlers');
-// console.log(handlers.getAllAccounts());
-
-// async function main() {
-//     // Get all accounts
-//     // accounts = await(handlers.allAccounts());
-//     // console.log(accounts);
-
-//     txs = await(handlers.allTransactionsForUser('0x0362a00720c90f5589f58e88abd6e602fa05ea76'));
-
-// }
 
 // Start server
 let app = express();
@@ -59,6 +49,11 @@ app.get("/allPositionsOfUser", async (req, res, next) => {
     positions = await handlers.allPositionsOfUser(userHash);
     res.json(positions);
 });
+
+app.get("/allMarkets", async (req, res, next) => {
+    markets = await handlers.allMarkets();
+    res.json(markets);
+})
 
 app.listen(8080, () => {
     console.log("Server running on port 8080");

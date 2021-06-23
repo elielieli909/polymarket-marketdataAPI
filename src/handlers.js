@@ -1,6 +1,5 @@
 // import Axios from "axios";
 const Axios = require("axios");
-const { query } = require("express");
 
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/tokenunion/polymarket-matic'
 
@@ -175,7 +174,9 @@ async function allPositionsOfUser(userAddress) {
             where: {user: "${userAddress}"}
         ){
             id
-            market
+            market {
+                id
+            }
             outcomeIndex
             quantityBought
             quantitySold
@@ -237,6 +238,13 @@ async function allMarkets() {
             }
         }
     }`
+    markets = [];
+    await query_subgraph(query).then((res) => {
+        markets = res.data.data.fixedProductMarketMakers;
+    }).catch((error) => {
+        console.log(error);
+    });
+    return markets;
 }
 
 module.exports = {
@@ -245,6 +253,7 @@ module.exports = {
     allFundingActionsForUser: allFundingActionsForUser,
     fpmmPoolMembershipsForUser: fpmmPoolMembershipsForUser,
     allPositionsOfUser: allPositionsOfUser,
+    allMarkets: allMarkets,
 
 
 };
