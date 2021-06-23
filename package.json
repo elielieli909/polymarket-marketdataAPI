@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@types/node": "^15.12.4"
+  },
+  "dependencies": {
+    "apollo": "^2.33.4",
+    "axios": "^0.21.1",
+    "express": "^4.17.1"
+  }
+}
