@@ -4,7 +4,7 @@ A REST API to grab data from Polymarket on Matic.
 
 ## Included Endpoints (No Auth Required)
 ### User Data
-* [allAccounts](allAccounts.md) : `GET /allAccounts`
+* [allAccounts](docs/allAccounts.md) : `GET /allAccounts`
 * [allTradesForUser](allTradesForUser.md) : `GET /allTradesForUser?hash={userWalletAddress}`
     - Send a list of all the trades done by a given wallet address
     - TODO: allow configurable time range
