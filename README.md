@@ -5,16 +5,16 @@ A REST API to grab data from Polymarket on Matic.
 ## Included Endpoints (No Auth Required)
 ### User Data
 * [allAccounts](allAccounts.md) : `GET /allAccounts`
-* [allTradesForUser] (userAddress) : `GET /allTradesForUser?hash={userWalletAddress}`
+* [allTradesForUser](allTradesForUser.md) : `GET /allTradesForUser?hash={userWalletAddress}`
     - Send a list of all the trades done by a given wallet address
     - TODO: allow configurable time range
-* [allFundingActionsForUser] (userAddress) : `GET /allFundingActionsForUser?hash={userWalletAddress}`
+* [allFundingActionsForUser](allFundingActionsForUser.md) : `GET /allFundingActionsForUser?hash={userWalletAddress}`
     - Send lists of all the funding additions/removals from a user
     - TODO: allow configurable time range
-* [fpmmPoolMembershipsForUser] (userAddress) : `GET /fpmmPoolMembershipsForUser?hash={userWalletAddress}`
+* [fpmmPoolMembershipsForUser](fpmmPoolMembershipsForUser.md) : `GET /fpmmPoolMembershipsForUser?hash={userWalletAddress}`
     - Get all the pool memberships of a user + how many LP token's of each pool
     - TODO: time range
-* [allPositionsOfUser] (userAddress) : `GET /allPositionsOfUser?hash={userWalletAddress}`
+* [allPositionsOfUser](allPositionsOfUser.md) : `GET /allPositionsOfUser?hash={userWalletAddress}`
     - Get a user's total positions
     - TODO: time range
 
