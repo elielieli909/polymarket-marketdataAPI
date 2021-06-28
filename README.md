@@ -22,7 +22,15 @@ Included endpoints:
 7. allMarkets
     - Send all the markets ever, current or expired
     - TODO: choose only current or expired (query it's Conditions), configurable time range
-8. historicalPrices (marketAddress)
-    - TODO: Send the price of each outcome over a configurable time (default to all-time)
+8. pricesForMarket (marketAddress, startTime, endTime, stepSize)
+    - Get a list of outcomeTokenPrices from startTime to endTime, skipping blocks over stepSize
+9. allTradesForMarket(marketAddress, )
+    - Get a list of all the trades on a market maker with marketAddress
 9. historicalFundingDetails (marketAddress)
     - TODO: Send a list of all the LP interactions with this market, time range
+
+
+TODO:
+finish all endpoints
+Add error handling
+write docs
