@@ -37,36 +37,54 @@ const RPC_matic_1 = require("./RPC-matic");
 let app = express();
 // GET routes
 app.get("/allAccounts", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const accounts = yield handlers.allAccounts();
-    res.json(accounts);
+    try {
+        const accounts = yield handlers.allAccounts();
+        res.json(accounts);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue while grabbing all accounts.");
+    }
 }));
 app.get("/allTradesForUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
         // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
-        res.json("Error, need hash in query param");
+        res.json("Need to provide user hash as a query param");
         return;
     }
     const userHash = req.query.hash;
-    const txs = yield handlers.allTradesForUser(userHash);
-    res.json(txs);
+    try {
+        const txs = yield handlers.allTradesForUser(userHash);
+        res.json(txs);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an error querying trades for this user.");
+    }
 }));
 app.get("/allFundingActionsForUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
         // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
-        res.json("Error, need hash in query param");
+        res.json("Need to provide user hash as a query param");
         return;
     }
     const userHash = req.query.hash;
-    const fundingActions = yield handlers.allFundingActionsForUser(userHash);
-    res.json(fundingActions);
+    try {
+        const fundingActions = yield handlers.allFundingActionsForUser(userHash);
+        res.json(fundingActions);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue querying for funding actions for this user.");
+    }
 }));
 app.get("/fpmmPoolMembershipsForUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
         // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
-        res.json("Error, need hash in query param");
+        res.json("Need to provide user hash as a query param");
         return;
     }
     const userHash = req.query.hash;
@@ -77,28 +95,38 @@ app.get("/allPositionsOfUser", (req, res) => __awaiter(void 0, void 0, void 0, f
     if (!req.query.hash) {
         // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
-        res.json("Error, need hash in query param");
+        res.json("Need to provide user hash as a query param");
         return;
     }
     const userHash = req.query.hash;
-    const positions = yield handlers.allPositionsOfUser(userHash);
-    res.json(positions);
+    try {
+        const positions = yield handlers.allPositionsOfUser(userHash);
+        res.json(positions);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue querying positions for this user.");
+    }
 }));
 app.get("/allMarkets", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const markets = yield handlers.allMarkets();
-    res.json(markets);
+    try {
+        const markets = yield handlers.allMarkets();
+        res.json(markets);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue while querying for all markets.");
+    }
 }));
 app.get("/pricesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
-        res.json("Error, need hash in query param");
+        res.json("Need to provide user hash as a query param");
         return;
     }
     if (!req.query.startTime) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
-        res.json("Error, need startTime in query param");
+        res.json("Need to provide a timestamp under a startTime query parameter");
         return;
     }
     var endTime;
@@ -117,22 +145,41 @@ app.get("/pricesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, func
     else {
         stepSize = Number(req.query.stepSize);
     }
-    const startBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(Number(req.query.startTime));
-    const endBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(endTime);
-    const prices = yield handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
-    res.json(prices);
+    var startBlock, endBlock;
+    try {
+        startBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(Number(req.query.startTime));
+        endBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(endTime);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue getting the block number for the provided timestamp.  Please try again.");
+        return;
+    }
+    try {
+        const prices = yield handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
+        res.json(prices);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("Could not query prices for the selected market or timeframe.");
+    }
 }));
 app.get("/allTradesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
         res.status(400);
-        res.json("Error, need hash in query param");
+        res.json("Need to provide user hash as a query param");
         return;
     }
-    const txs = yield handlers.allTradesForMarket(req.query.hash);
-    res.json(txs);
+    try {
+        const txs = yield handlers.allTradesForMarket(req.query.hash);
+        res.json(txs);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue querying trades for this market.");
+    }
 }));
 app.listen(8080, () => {
     console.log("Server running on port 8080");
 });
-// main();
 //# sourceMappingURL=index.js.map

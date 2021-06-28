@@ -34,7 +34,6 @@ export async function allAccounts(): Promise<Account[]> {
                 creationTimestamp
                 lastSeenTimestamp
                 scaledCollateralVolume
-                numTrades
                 lastTradedTimestamp
             }
         }`;

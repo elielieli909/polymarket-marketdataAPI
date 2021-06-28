@@ -36,8 +36,7 @@ function allAccounts() {
         var prev_last_id = '0';
         var accounts = [];
         var done = false;
-        // while (!done) {
-        while (!done && accounts.length < 100) { // for testing
+        while (!done) {
             let query = `query {
             accounts(
                 where: {id_gt: "${prev_last_id}"}
@@ -47,11 +46,11 @@ function allAccounts() {
                 creationTimestamp
                 lastSeenTimestamp
                 scaledCollateralVolume
-                numTrades
                 lastTradedTimestamp
             }
         }`;
             yield query_subgraph(query).then((res) => {
+                console.log(res.data);
                 if (res.data.data.accounts.length == 0) {
                     done = true;
                     return;
@@ -62,6 +61,7 @@ function allAccounts() {
             })
                 .catch((error) => {
                 console.log(error);
+                throw error;
             });
         }
         return accounts;
@@ -69,41 +69,54 @@ function allAccounts() {
 }
 exports.allAccounts = allAccounts;
 /**
- * Grab all the transactions (trades) for a given user **NOTE** ASSUMES USER HAS DONE LESS THAN 1000 OF EACH
- * TODO: FIX THAT                                                   ^
+ * Grab all the transactions (trades) for a given user, sorted by timestamp
  * ALSO, TRADEAMOUNT ISN'T A FLOAT.
  * TODO: FIGURE OUT IF SHOULD KEEP AS IS OR TURN INTO USD VALUE INSTEAD OF USDC
- * TODO: Sort by timestamp (order_by isn't working for some reason)
- * TODO: nothing shows up for market???
  * @param userAddress - the matic wallet hash of the target user
  * @returns a list of transactions (txid, type(B or S), marketID, tradeAmount, feesPaid, whatOutcome, howManyOutcomeTokens, timestamp)
  */
 function allTradesForUser(userAddress) {
     return __awaiter(this, void 0, void 0, function* () {
-        let query = `query {
-        transactions(
-            where: {user: "${userAddress}"}
-            first: 1000
-        ){
-            id
-            type
-            market {
+        var done = false;
+        var prev_timestamp = "0";
+        var txs = [];
+        while (!done) {
+            let query = `query {
+            transactions(
+                where: {
+                    user: "${userAddress}"
+                    timestamp_gt: ${prev_timestamp}
+                }
+                first: 1000
+                orderBy: timestamp
+                orderDirection: asc
+            ){
                 id
+                type
+                market {
+                    id
+                }
+                tradeAmount
+                feeAmount
+                outcomeIndex
+                outcomeTokensAmount
+                timestamp
             }
-            tradeAmount
-            feeAmount
-            outcomeIndex
-            outcomeTokensAmount
-            timestamp
+        }`;
+            yield query_subgraph(query).then((res) => {
+                if (res.data.data.transactions.length == 0) {
+                    done = true;
+                    return;
+                }
+                // Join lists of txs, ignoring duplicates
+                txs = txs.concat(res.data.data.transactions);
+                prev_timestamp = res.data.data.transactions.slice(-1)[0].timestamp;
+            }).catch((error) => {
+                console.log(error);
+                throw error;
+            });
         }
-    }`;
-        var txData = null;
-        yield query_subgraph(query).then((res) => {
-            txData = res.data.data;
-        }).catch((error) => {
-            console.log(error);
-        });
-        return txData;
+        return txs;
     });
 }
 exports.allTradesForUser = allTradesForUser;
@@ -151,6 +164,7 @@ function allFundingActionsForUser(userAddress) {
             fundingData = res.data.data;
         }).catch((error) => {
             console.log(error);
+            throw error;
         });
         return fundingData;
     });
@@ -183,11 +197,17 @@ function fpmmPoolMembershipsForUser(userAddress) {
             }
         }).catch((error) => {
             console.log(error);
+            throw error;
         });
         return memberships;
     });
 }
 exports.fpmmPoolMembershipsForUser = fpmmPoolMembershipsForUser;
+/**
+ * Grabs all the current positions of a user, including the market id, amount bought/sold, feespaid, and chosen outcome
+ * @param userAddress the wallet address of the target user
+ * @returns a list of marketPositions
+ */
 function allPositionsOfUser(userAddress) {
     return __awaiter(this, void 0, void 0, function* () {
         let query = `query {
@@ -213,11 +233,16 @@ function allPositionsOfUser(userAddress) {
             positions = res.data.data.marketPositions;
         }).catch((error) => {
             console.log(error);
+            throw error;
         });
         return positions;
     });
 }
 exports.allPositionsOfUser = allPositionsOfUser;
+/**
+ * Query a list of all the markets on polymarket, live markets have null resolutionTimestamp
+ * @returns a list of all markets
+ */
 function allMarkets() {
     return __awaiter(this, void 0, void 0, function* () {
         let query = `query {
@@ -267,11 +292,20 @@ function allMarkets() {
             markets = res.data.data.fixedProductMarketMakers;
         }).catch((error) => {
             console.log(error);
+            throw error;
         });
         return markets;
     });
 }
 exports.allMarkets = allMarkets;
+/**
+ * Get a list of prices for outcomes on a given market
+ * @param marketAddress the address of the market maker
+ * @param startBlock the first block in the query range
+ * @param endBlock optional - defaults to the block at Date.now(); the final block in the query range
+ * @param stepSize optional - defaults to 30; the number of blocks to skip between price lookups
+ * @returns a list of prices at each block in the range
+ */
 function pricesForMarket(marketAddress, startBlock, endBlock, stepSize) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!stepSize) {
@@ -290,12 +324,20 @@ function pricesForMarket(marketAddress, startBlock, endBlock, stepSize) {
                     prices: res.data.data.fixedProductMarketMaker.outcomeTokenPrices
                 };
                 prices.push(priceStruct);
+            }).catch((error) => {
+                console.error(error);
+                throw error;
             });
         }
         return prices;
     });
 }
 exports.pricesForMarket = pricesForMarket;
+/**
+ * Grab all the trades performed with a given market maker
+ * @param marketAddress the address of the market maker
+ * @returns a list of Transactions interacting with the market maker
+ */
 function allTradesForMarket(marketAddress) {
     return __awaiter(this, void 0, void 0, function* () {
         let done = false;
@@ -308,7 +350,7 @@ function allTradesForMarket(marketAddress) {
                     market: "${marketAddress}"
                     timestamp_gt: ${prev_timestamp}
                 }
-                first:10
+                first:1000
                 orderBy: timestamp
                 orderDirection: asc
             ) {
@@ -335,10 +377,10 @@ function allTradesForMarket(marketAddress) {
                 // Join lists of txs, ignoring duplicates
                 txs = txs.concat(res.data.data.transactions);
                 prev_timestamp = res.data.data.transactions.slice(-1)[0].timestamp;
-                console.log(prev_timestamp);
             })
                 .catch((error) => {
-                console.log(error);
+                console.error(error);
+                throw error;
             });
         }
         return txs;
