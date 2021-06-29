@@ -198,6 +198,9 @@ export async function allPositionsOfUser(userAddress: string) {
             id
             market {
                 id
+                conditions {
+                    resolutionTimestamp
+                }
             }
             outcomeIndex
             quantityBought
@@ -212,6 +215,10 @@ export async function allPositionsOfUser(userAddress: string) {
     var positions: AccountMarketPosition[] = [];
     await query_subgraph(query).then((res) => {
         positions = res.data.data.marketPositions;
+        // Trim the account address from id (theGraph gives accountID + poolID)
+        for (var i = 0; i < positions.length; i++) {
+            positions[i].id = positions[i].id.slice(42);
+        }
     }).catch((error) => {
         console.log(error);
         throw error;

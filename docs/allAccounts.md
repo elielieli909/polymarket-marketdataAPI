@@ -1,4 +1,4 @@
-# Login
+# All Accounts
 
 Used to grab a list of all accounts on Polymarket.
 

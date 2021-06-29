@@ -50,7 +50,6 @@ function allAccounts() {
             }
         }`;
             yield query_subgraph(query).then((res) => {
-                console.log(res.data);
                 if (res.data.data.accounts.length == 0) {
                     done = true;
                     return;
@@ -217,6 +216,9 @@ function allPositionsOfUser(userAddress) {
             id
             market {
                 id
+                conditions {
+                    resolutionTimestamp
+                }
             }
             outcomeIndex
             quantityBought
@@ -231,6 +233,10 @@ function allPositionsOfUser(userAddress) {
         var positions = [];
         yield query_subgraph(query).then((res) => {
             positions = res.data.data.marketPositions;
+            // Trim the account address from id (theGraph gives accountID + poolID)
+            for (var i = 0; i < positions.length; i++) {
+                positions[i].id = positions[i].id.slice(42);
+            }
         }).catch((error) => {
             console.log(error);
             throw error;
