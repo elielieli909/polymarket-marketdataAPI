@@ -1,215 +1,215 @@
-## Account
-### id
+### Account
+#### id
 * User address
-### creationTimestamp
+#### creationTimestamp
 * Timestamp at which account first interacted with Polymarket
-### lastSeenTimestamp
+#### lastSeenTimestamp
 * Timestamp at which account most recently interacted with Polymarket
-### collateralVolume
+#### collateralVolume
 * Total volume of this user's trades in USDC base units
-### numTrades
+#### numTrades
 * Total number of trades performed by this user
-### scaledCollateralVolume
+#### scaledCollateralVolume
 * Total volume of this user's trades in USDC scaled by 10^6
-### lastTradedTimestamp
+#### lastTradedTimestamp
 * Timestamp of last Buy or Sell transaction
-### fpmmPoolMemberships
+#### fpmmPoolMemberships
 * Markets in which user has provided liquidity
-### marketPositions
+#### marketPositions
 * Markets in which the user has taken a position on the outcome
-### transactions
+#### transactions
 * Purchases and sales of shares by the user
-### splits
+#### splits
 * Split of collateral / outcome tokens into multiple positions
-### merges
+#### merges
 * Merge of more specific outcome tokens into collateral / more general outcome tokens
-### redemptions
+#### redemptions
 * Redemption of underlying collateral after a market has resolved
-## Collateral
-### id
+### Collateral
+#### id
 * Token address
-### name
-### symbol
-### decimals
-## Condition
-### id
-### oracle
+#### name
+#### symbol
+#### decimals
+### Condition
+#### id
+#### oracle
 * Address which can resolve this condition
-### questionId
+#### questionId
 * Question ID which corresponds to this condition
-### outcomeSlotCount
+#### outcomeSlotCount
 * Number of possible outcomes for this condition
-### resolutionTimestamp
+#### resolutionTimestamp
 * Timestamp at which this condition was resolved
-### payouts
+#### payouts
 * Fraction of collateral assigned to each outcome
-### payoutNumerators
-### payoutDenominator
-### fixedProductMarketMakers
+#### payoutNumerators
+#### payoutDenominator
+#### fixedProductMarketMakers
 * Market makers which are trading on this condition
-## FixedProductMarketMaker
-### id
+### FixedProductMarketMaker
+#### id
 * Market maker address
-### creator
+#### creator
 * Address which deployed this market
-### creationTimestamp
+#### creationTimestamp
 * Time at which this market was deployed
-### creationTransactionHash
+#### creationTransactionHash
 * Hash of deployment transactions
-### collateralToken
+#### collateralToken
 * Token which is colleralising this market
-### conditions
+#### conditions
 * Conditions which this market is trading against
-### fee
+#### fee
 * Percentage fee of trades taken by market maker. A 2% fee is represented as 2*10^16
-### tradesQuantity
+#### tradesQuantity
 * Number of trades of any kind against this market maker
-### buysQuantity
+#### buysQuantity
 * Number of purchases of shares from this market maker
-### sellsQuantity
+#### sellsQuantity
 * Number of sales of shares to this market maker
-### liquidityAddQuantity
+#### liquidityAddQuantity
 * Number of times liquidity has been added to this market maker
-### liquidityRemoveQuantity
+#### liquidityRemoveQuantity
 * Number of times liquidity has been removed from this market maker
-### collateralVolume
+#### collateralVolume
 * Market volume in terms of the underlying collateral value
-### scaledCollateralVolume
+#### scaledCollateralVolume
 * Volume scaled by the number of decimals of collateralToken
-### collateralBuyVolume
+#### collateralBuyVolume
 * Global volume of share purchases in USDC base units
-### scaledCollateralBuyVolume
+#### scaledCollateralBuyVolume
 * Global volume of share purchases in USDC scaled by 10^6
-### collateralSellVolume
+#### collateralSellVolume
 * Global volume of share sales in USDC base units
-### scaledCollateralSellVolume
+#### scaledCollateralSellVolume
 * Global volume of share sales in USDC scaled by 10^6
-### feeVolume
+#### feeVolume
 * Fees collected in terms of the underlying collateral value
-### scaledFeeVolume
+#### scaledFeeVolume
 * Fees scaled by the number of decimals of collateralToken
-### liquidityParameter
+#### liquidityParameter
 * Constant product parameter k
-### scaledLiquidityParameter
-### outcomeTokenAmounts
+#### scaledLiquidityParameter
+#### outcomeTokenAmounts
 * Balances of each outcome token held by the market maker
-### outcomeTokenPrices
+#### outcomeTokenPrices
 * Prices at which market maker values each outcome token
-### outcomeSlotCount
+#### outcomeSlotCount
 * Number of outcomes which this market maker is trading
-### lastActiveDay
+#### lastActiveDay
 * Timestamp of last day during which someone made a trade
-### totalSupply
+#### totalSupply
 * Number of shares for tokens in the market maker's reserves
-### poolMembers
+#### poolMembers
 * Addresses which are supplying liquidity to the market maker
-## FpmmFundingAddition
-### id
+### FpmmFundingAddition
+#### id
 * Transaction Hash
-### timestamp
+#### timestamp
 * Timestamp at which funding addition occurred
-### fpmm
+#### fpmm
 * FPMM to which funding is being added
-### funder
+#### funder
 * Account adding funding
-### amountsAdded
+#### amountsAdded
 * Outcome tokens amounts added to FPMM
-### amountsRefunded
+#### amountsRefunded
 * Outcome tokens amounts refunded to funder
-### sharesMinted
+#### sharesMinted
 * Liquidity shares minted to funder
-## FpmmFundingRemoval
-### id
+### FpmmFundingRemoval
+#### id
 * Transaction Hash
-### timestamp
+#### timestamp
 * Timestamp at which funding removal occurred
-### fpmm
+#### fpmm
 * FPMM to which funding is being removed
-### funder
+#### funder
 * Account removing funding
-### amountsRemoved
+#### amountsRemoved
 * Outcome tokens amounts removed from FPMM
-### collateralRemoved
-### sharesBurnt
+#### collateralRemoved
+#### sharesBurnt
 * Liquidity shares burned by funder
-## FpmmPoolMembership
-### id
+### FpmmPoolMembership
+#### id
 * funder address + pool address
-### pool
+#### pool
 * Market to which funder is providing funding
-### funder
+#### funder
 * Account which is providing funding
-### amount
+#### amount
 * Amount of liquidity tokens owned by funder
-## Global
-### id
+### Global
+#### id
 * ID is empty string, this is a singleton
-### numConditions
-### numOpenConditions
-### numClosedConditions
-### numTraders
+#### numConditions
+#### numOpenConditions
+#### numClosedConditions
+#### numTraders
 * Number of unique traders interacting with Polymarket
-### tradesQuantity
+#### tradesQuantity
 * Number of trades of any kind for all market makers
-### buysQuantity
+#### buysQuantity
 * Number of purchases of shares from any market maker
-### sellsQuantity
+#### sellsQuantity
 * Number of sales of shares to any market maker
-### collateralVolume
+#### collateralVolume
 * Global volume in USDC base units
-### scaledCollateralVolume
+#### scaledCollateralVolume
 * Global volume in USDC scaled by 10^6
-### collateralFees
+#### collateralFees
 * Global fees in USDC base units
-### scaledCollateralFees
+#### scaledCollateralFees
 * Global fees in USDC scaled by 10^6
-### collateralBuyVolume
+#### collateralBuyVolume
 * Global volume of share purchases in USDC base units
-### scaledCollateralBuyVolume
+#### scaledCollateralBuyVolume
 * Global volume of share purchases in USDC scaled by 10^6
-### collateralSellVolume
+#### collateralSellVolume
 * Global volume of share sales in USDC base units
-### scaledCollateralSellVolume
+#### scaledCollateralSellVolume
 * Global volume of share sales in USDC scaled by 10^6
-## MarketPosition
-### id
+### MarketPosition
+#### id
 * concatenated userID + marketID
-### market
+#### market
 * Market on which this position is on
-### user
+#### user
 * Address which holds this position
-### outcomeIndex
+#### outcomeIndex
 * The outcome which this position is supporting
-### quantityBought
+#### quantityBought
 * Number of outcome shares that the user has ever bought
-### quantitySold
+#### quantitySold
 * Number of outcome shares that the user has ever sold
-### netQuantity
+#### netQuantity
 * Number of outcome shares that the user current has
-### valueBought
+#### valueBought
 * Total value of outcome shares that the user has bought
-### valueSold
+#### valueSold
 * Total value of outcome shares that the user has sold
-### netValue
+#### netValue
 * Total value paid by the user to enter this position
-### feesPaid
+#### feesPaid
 * Total amount of fees paid by user in relation to this position
-## Transaction
-### id
+### Transaction
+#### id
 * Transaction Hash
-### type
+#### type
 * Buy or Sell transaction
-### timestamp
+#### timestamp
 * Timestamp at which transaction occurred
-### market
+#### market
 * Market which transaction is interacting with
-### user
+#### user
 * Account performing transaction
-### tradeAmount
+#### tradeAmount
 * Amount of collateral in trade
-### feeAmount
+#### feeAmount
 * Amount of collateral paid in fees
-### outcomeIndex
+#### outcomeIndex
 * Index of outcome token being bought or sold
-### outcomeTokensAmount
+#### outcomeTokensAmount
 * Amount of outcome tokens being bought or sold

@@ -10,9 +10,9 @@ with open("polymarket_subgraph_docs.json") as f:
             continue
         print(type['name'])
     
-        filedump += "## " + type['name'] + '\n'
+        filedump += "### " + type['name'] + '\n'
         for field in type['fields']:
-            filedump += "### " + field['name'] + '\n'
+            filedump += "#### " + field['name'] + '\n'
             if field['description'] is not None:
                 filedump += "* " + field['description'] + '\n'
 
