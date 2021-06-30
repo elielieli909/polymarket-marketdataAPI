@@ -1,3 +1,4 @@
+# Graph Introspection Results
 ## Account
 ### id
 * User address
