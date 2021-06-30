@@ -1,6 +1,6 @@
 import json
 
-filedump = ""
+filedump = "# Subgraph Introspection Results\n"
 with open("polymarket_subgraph_docs.json") as f:
     data = json.load(f)
     types = data['data']['__schema']['types']
@@ -16,5 +16,5 @@ with open("polymarket_subgraph_docs.json") as f:
             if field['description'] is not None:
                 filedump += "* " + field['description'] + '\n'
 
-with open("polymarket_subgraph_docs.md", 'w') as f:
+with open("README.md", 'w') as f:
     f.write(filedump)
