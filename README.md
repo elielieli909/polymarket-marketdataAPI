@@ -16,12 +16,3 @@ No auth required.
 * [pricesForMarket](docs/pricesForMarket.md) : `GET /pricesForMarket?hash={fpmmContractAddress}&startTime={timestampToStartQuery}`
 * [pricesForMarketByBlock](docs/pricesForMarketByBlock.md) : `GET /pricesForMarketByBlock?hash={fpmmContractAddress}&startBlock={timestampToStartQuery}`
 * [allTradesForMarket](docs/allTradesForMarket.md) : `GET /allTradesForMarket?hash={fpmmContractAddress}`
-    - Get a list of all the trades on a market maker with marketAddress
-* [historicalFundingDetails] (marketAddress)
-    - TODO: Send a list of all the LP interactions with this market, time range
-
-
-TODO:
-finish all endpoints
-Add error handling
-write docs
