@@ -1,15 +1,12 @@
 const express = require('express');
 import { start } from "repl";
-// const handlers = require('./handlers');
-// import express from "express";
 import * as handlers from "./handlers";
 import {getBlockNumberAtTimestamp, getCurrentBlockNumber} from "./RPC-matic";
 
 // Start server
 let app = express();
 
-// GET routes
-app.get("/allAccounts", async (req: any, res: any) => {
+app.get("/allAccounts", async (res: any) => {
     try {
         const accounts = await handlers.allAccounts();
         res.json(accounts);
@@ -21,7 +18,6 @@ app.get("/allAccounts", async (req: any, res: any) => {
 
 app.get("/allTradesForUser", async (req: any, res: any) => {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
@@ -38,7 +34,6 @@ app.get("/allTradesForUser", async (req: any, res: any) => {
 
 app.get("/allFundingActionsForUser", async (req: any, res: any) => {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
@@ -55,19 +50,23 @@ app.get("/allFundingActionsForUser", async (req: any, res: any) => {
 
 app.get("/fpmmPoolMembershipsForUser", async (req: any, res: any) => {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
     }
     const userHash = req.query.hash;
-    const poolMemberships = await handlers.fpmmPoolMembershipsForUser(userHash);
-    res.json(poolMemberships);
+    try {
+        const poolMemberships = await handlers.fpmmPoolMembershipsForUser(userHash);
+        res.json(poolMemberships);
+    } catch (e) {
+        res.status(500);
+        res.send("There was an issue grabbing this user's pool memberships.");
+    }
+    
 });
 
 app.get("/allPositionsOfUser", async (req: any, res: any) => {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
@@ -103,21 +102,26 @@ app.get("/pricesForMarket", async (req: any, res: any) => {
         res.json("Need to provide a timestamp under a startTime query parameter");
         return;
     }
+
     var endTime: number;
     var startBlock, endBlock = null;
+
+    // If no specified end date, use now
     if (!req.query.endTime) {
-        // No specified end date, use now
         endTime = Math.floor(Date.now() / 1000);
     } else {
         endTime = Number(req.query.endTime);
     }
+
+    // default step size = 30 (Approx 1 min intervals)
     var stepSize: number;
     if (!req.query.stepSize) {
-        // default step size = 30 (Approx 1 min intervals)
         stepSize = 43200;
     } else {
         stepSize = Number(req.query.stepSize);
     }
+
+    // Get block numbers of requested timestamps
     try {
         startBlock = await getBlockNumberAtTimestamp(Number(req.query.startTime));
         endBlock = await getBlockNumberAtTimestamp(endTime);
@@ -127,6 +131,7 @@ app.get("/pricesForMarket", async (req: any, res: any) => {
         res.send("There was an issue getting the block number for the provided timestamp.  Please try again.");
         return;
     }
+
     try {
         const prices = await handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
         res.json(prices);
@@ -147,16 +152,18 @@ app.get("/pricesForMarketByBlock", async (req:any, res:any) => {
         res.json("Need to provide a block number under a startBlock query parameter");
         return;
     }
+
+    // No specified end block, use now
     var endBlock = null;
     if (!req.query.endBlock) {
-        // No specified end date, use now
         endBlock = await getCurrentBlockNumber();
     } else {
         endBlock = Number(req.query.endBlock);
     }
+
+    // default step size = 43200 (Approx 1 day intervals, assuming block time of ~2s)
     var stepSize: number;
     if (!req.query.stepSize) {
-        // default step size = 43200 (Approx 1 day intervals, assuming block time of ~2s)
         stepSize = 43200;
     } else {
         stepSize = Number(req.query.stepSize);
