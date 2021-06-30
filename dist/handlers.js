@@ -218,7 +218,9 @@ function allPositionsOfUser(userAddress) {
             market {
                 id
                 conditions {
+                    id
                     resolutionTimestamp
+                    payouts
                 }
             }
             outcomeIndex

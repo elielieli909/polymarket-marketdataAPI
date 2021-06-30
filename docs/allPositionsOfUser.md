@@ -22,7 +22,10 @@ Used to look at all the current/past positions of a user, the difference being t
         "market": {
             "conditions": [
                 {
-                    "resolutionTimestamp": null // An example of an unresolved position
+                    "id": "0x1debe9432c970f6e08972fd54bfe7242ff3c8e2bdfc68c8a0c77d8876e8dd33c",
+                    "payouts": null,
+                    "resolutionTimestamp": null, // An example of an unresolved position
+
                 }
             ],
             "id": "0x0052f24bdfa63331a654ddab54e167593a442ea4"
@@ -42,7 +45,12 @@ Used to look at all the current/past positions of a user, the difference being t
         "market": {
             "conditions": [
                 {
-                    "resolutionTimestamp": "1623427345" // An example of a resolved position
+                    "id": "0x35b24743c50c193259ba6ec0412857950928522ee4aefeb094e9660958f93936",
+                    "payouts": [
+                        "1",
+                        "0"
+                    ],
+                    "resolutionTimestamp": "1623427345", // An example of a resolved position
                 }
             ],
             "id": "0x00f365b53ca9477dbad1fcda0b820cfa7f38d27a"

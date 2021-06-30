@@ -200,7 +200,9 @@ export async function allPositionsOfUser(userAddress: string) {
             market {
                 id
                 conditions {
+                    id
                     resolutionTimestamp
+                    payouts
                 }
             }
             outcomeIndex
