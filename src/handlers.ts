@@ -2,6 +2,7 @@ import Axios from "axios";
 import { start } from "repl";
 // const Axios = require("axios");
 import { Account, Transaction, FpmmPoolMembership, AccountMarketPosition, Market } from "./interfaces";
+import {getTimestampFromBlocknumber} from "./RPC-matic";
 
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading'
 
@@ -234,6 +235,8 @@ export async function allMarkets(): Promise<Market[]> {
     let query = `query {
         fixedProductMarketMakers (
             first:1000
+            orderBy: creationTimestamp
+            orderDirection: asc
         ) 
         {
             id
@@ -246,6 +249,7 @@ export async function allMarkets(): Promise<Market[]> {
             conditions {
                 id
                 resolutionTimestamp
+                payouts
             }
             fee
             tradesQuantity
@@ -276,6 +280,12 @@ export async function allMarkets(): Promise<Market[]> {
     var markets: Market[] = [];
     await query_subgraph(query).then((res) => {
         markets = res.data.data.fixedProductMarketMakers;
+        // Trim id of poolmembers (it's pool id + user id)
+        markets.forEach((market) => {
+            market.poolMembers.forEach(poolMember => {
+                poolMember.id = poolMember.id.slice(42);
+            });
+        })
     }).catch((error) => {
         console.log(error);
         throw error;
@@ -302,8 +312,13 @@ export async function pricesForMarket(marketAddress: string, startBlock: number,
                         outcomeTokenPrices
                     }
                 }`;
-        await query_subgraph(query).then((res) => {
+        await query_subgraph(query).then(async (res) => {
+            if (!res.data.data.fixedProductMarketMaker) {
+                return;
+            }
+            const timestamp = await getTimestampFromBlocknumber(i);
             const priceStruct = {
+                timestamp: timestamp,
                 block: i,
                 prices: res.data.data.fixedProductMarketMaker.outcomeTokenPrices
             };

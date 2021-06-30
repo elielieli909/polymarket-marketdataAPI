@@ -3,7 +3,7 @@ import { start } from "repl";
 // const handlers = require('./handlers');
 // import express from "express";
 import * as handlers from "./handlers";
-import {getBlockNumberAtTimestamp} from "./RPC-matic";
+import {getBlockNumberAtTimestamp, getCurrentBlockNumber} from "./RPC-matic";
 
 // Start server
 let app = express();
@@ -104,6 +104,7 @@ app.get("/pricesForMarket", async (req: any, res: any) => {
         return;
     }
     var endTime: number;
+    var startBlock, endBlock = null;
     if (!req.query.endTime) {
         // No specified end date, use now
         endTime = Math.floor(Date.now() / 1000);
@@ -113,21 +114,56 @@ app.get("/pricesForMarket", async (req: any, res: any) => {
     var stepSize: number;
     if (!req.query.stepSize) {
         // default step size = 30 (Approx 1 min intervals)
-        stepSize = 30;
+        stepSize = 43200;
     } else {
         stepSize = Number(req.query.stepSize);
     }
-    var startBlock, endBlock;
     try {
         startBlock = await getBlockNumberAtTimestamp(Number(req.query.startTime));
         endBlock = await getBlockNumberAtTimestamp(endTime);
     } catch (e) {
+        console.error(e);
         res.status(500);
         res.send("There was an issue getting the block number for the provided timestamp.  Please try again.");
         return;
     }
     try {
         const prices = await handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
+        res.json(prices);
+    } catch (e) {
+        res.status(500);
+        res.send("Could not query prices for the selected market or timeframe.");
+    }
+});
+
+app.get("/pricesForMarketByBlock", async (req:any, res:any) => {
+    if (!req.query.hash) {
+        res.status(400);
+        res.json("Need to provide user hash as a query param");
+        return;
+    }
+    if (!req.query.startBlock) {
+        res.status(400);
+        res.json("Need to provide a block number under a startBlock query parameter");
+        return;
+    }
+    var endBlock = null;
+    if (!req.query.endBlock) {
+        // No specified end date, use now
+        endBlock = await getCurrentBlockNumber();
+    } else {
+        endBlock = Number(req.query.endBlock);
+    }
+    var stepSize: number;
+    if (!req.query.stepSize) {
+        // default step size = 43200 (Approx 1 day intervals, assuming block time of ~2s)
+        stepSize = 43200;
+    } else {
+        stepSize = Number(req.query.stepSize);
+    }
+
+    try {
+        const prices = await handlers.pricesForMarket(req.query.hash, Number(req.query.startBlock), endBlock, stepSize);
         res.json(prices);
     } catch (e) {
         res.status(500);

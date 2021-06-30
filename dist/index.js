@@ -130,6 +130,7 @@ app.get("/pricesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, func
         return;
     }
     var endTime;
+    var startBlock, endBlock = null;
     if (!req.query.endTime) {
         // No specified end date, use now
         endTime = Math.floor(Date.now() / 1000);
@@ -140,23 +141,59 @@ app.get("/pricesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, func
     var stepSize;
     if (!req.query.stepSize) {
         // default step size = 30 (Approx 1 min intervals)
-        stepSize = 30;
+        stepSize = 43200;
     }
     else {
         stepSize = Number(req.query.stepSize);
     }
-    var startBlock, endBlock;
     try {
         startBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(Number(req.query.startTime));
         endBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(endTime);
     }
     catch (e) {
+        console.error(e);
         res.status(500);
         res.send("There was an issue getting the block number for the provided timestamp.  Please try again.");
         return;
     }
     try {
         const prices = yield handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
+        res.json(prices);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("Could not query prices for the selected market or timeframe.");
+    }
+}));
+app.get("/pricesForMarketByBlock", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.query.hash) {
+        res.status(400);
+        res.json("Need to provide user hash as a query param");
+        return;
+    }
+    if (!req.query.startBlock) {
+        res.status(400);
+        res.json("Need to provide a block number under a startBlock query parameter");
+        return;
+    }
+    var endBlock = null;
+    if (!req.query.endBlock) {
+        // No specified end date, use now
+        endBlock = yield RPC_matic_1.getCurrentBlockNumber();
+    }
+    else {
+        endBlock = Number(req.query.endBlock);
+    }
+    var stepSize;
+    if (!req.query.stepSize) {
+        // default step size = 43200 (Approx 1 day intervals, assuming block time of ~2s)
+        stepSize = 43200;
+    }
+    else {
+        stepSize = Number(req.query.stepSize);
+    }
+    try {
+        const prices = yield handlers.pricesForMarket(req.query.hash, Number(req.query.startBlock), endBlock, stepSize);
         res.json(prices);
     }
     catch (e) {

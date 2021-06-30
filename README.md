@@ -2,7 +2,8 @@
 
 A REST API to grab data from Polymarket on Matic.
 
-## Included Endpoints (No Auth Required)
+## Included Endpoints
+No auth required.
 ### User Data
 * [allAccounts](docs/allAccounts.md) : `GET /allAccounts`
 * [allTradesForUser](docs/allTradesForUser.md) : `GET /allTradesForUser?hash={userWalletAddress}`
@@ -11,15 +12,10 @@ A REST API to grab data from Polymarket on Matic.
 * [allPositionsOfUser](docs/allPositionsOfUser.md) : `GET /allPositionsOfUser?hash={userWalletAddress}`
 
 ### Market Data
-* [allMarkets] : `GET /allMarkets`
-    - Send all the markets ever, current or expired
-    - TODO: choose only current or expired (query it's Conditions), configurable time range
-* [pricesForMarket] (marketAddress, startTime, endTime, stepSize) : `GET /pricesForMarket?hash={fpmmContractAddress}&startTime={timestampToStartQuery}`
-    - Optional query parameters:
-        - endTime={timestampToEndQuery} -- defaults to now
-        - stepSize={stepSize} -- number of blocks to skip between price lookups, defaults to 30 (keep in mind Polygon block times are ~2 seconds)
-    - Get a list of outcomeTokenPrices from startTime to endTime, skipping blocks over stepSize
-* [allTradesForMarket](marketAddress, ) : `GET /allTradesForMarket?hash={fpmmContractAddress}`
+* [allMarkets](docs/allMarkets.md) : `GET /allMarkets`
+* [pricesForMarket](docs/pricesForMarket.md) : `GET /pricesForMarket?hash={fpmmContractAddress}&startTime={timestampToStartQuery}`
+* [pricesForMarketByBlock](docs/pricesForMarketByBlock.md) : `GET /pricesForMarketByBlock?hash={fpmmContractAddress}&startBlock={timestampToStartQuery}`
+* [allTradesForMarket](docs/allTradesForMarket.md) : `GET /allTradesForMarket?hash={fpmmContractAddress}`
     - Get a list of all the trades on a market maker with marketAddress
 * [historicalFundingDetails] (marketAddress)
     - TODO: Send a list of all the LP interactions with this market, time range

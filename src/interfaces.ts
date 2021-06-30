@@ -82,5 +82,5 @@ export interface Market {
     totalSupply: string;
     poolMembers: {
         id: string;
-    };
+    }[];
 }

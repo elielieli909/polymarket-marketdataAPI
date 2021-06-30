@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allTradesForMarket = exports.pricesForMarket = exports.allMarkets = exports.allPositionsOfUser = exports.fpmmPoolMembershipsForUser = exports.allFundingActionsForUser = exports.allTradesForUser = exports.allAccounts = void 0;
 const axios_1 = __importDefault(require("axios"));
+const RPC_matic_1 = require("./RPC-matic");
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading';
 /**
  * Helper function for interacting with TheGraph via http POST
@@ -254,6 +255,8 @@ function allMarkets() {
         let query = `query {
         fixedProductMarketMakers (
             first:1000
+            orderBy: creationTimestamp
+            orderDirection: asc
         ) 
         {
             id
@@ -266,6 +269,7 @@ function allMarkets() {
             conditions {
                 id
                 resolutionTimestamp
+                payouts
             }
             fee
             tradesQuantity
@@ -296,6 +300,12 @@ function allMarkets() {
         var markets = [];
         yield query_subgraph(query).then((res) => {
             markets = res.data.data.fixedProductMarketMakers;
+            // Trim id of poolmembers (it's pool id + user id)
+            markets.forEach((market) => {
+                market.poolMembers.forEach(poolMember => {
+                    poolMember.id = poolMember.id.slice(42);
+                });
+            });
         }).catch((error) => {
             console.log(error);
             throw error;
@@ -324,13 +334,18 @@ function pricesForMarket(marketAddress, startBlock, endBlock, stepSize) {
                         outcomeTokenPrices
                     }
                 }`;
-            yield query_subgraph(query).then((res) => {
+            yield query_subgraph(query).then((res) => __awaiter(this, void 0, void 0, function* () {
+                if (!res.data.data.fixedProductMarketMaker) {
+                    return;
+                }
+                const timestamp = yield RPC_matic_1.getTimestampFromBlocknumber(i);
                 const priceStruct = {
+                    timestamp: timestamp,
                     block: i,
                     prices: res.data.data.fixedProductMarketMaker.outcomeTokenPrices
                 };
                 prices.push(priceStruct);
-            }).catch((error) => {
+            })).catch((error) => {
                 console.error(error);
                 throw error;
             });
