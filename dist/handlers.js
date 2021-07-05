@@ -16,6 +16,7 @@ exports.allTradesForMarket = exports.pricesForMarket = exports.allMarkets = expo
 const axios_1 = __importDefault(require("axios"));
 const RPC_matic_1 = require("./RPC-matic");
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading';
+const STRAPI_URL = 'https://strapi-matic.poly.market/markets';
 /**
  * Helper function for interacting with TheGraph via http POST
  * @param query - multiline string argument containing the gql query
@@ -26,6 +27,15 @@ function query_subgraph(query) {
         return axios_1.default.post(SUBGRAPH_URL, {
             query: query
         });
+    });
+}
+/**
+ * Helper function for interacting with the Strapi API
+ * @returns a list of all markets + metadata
+ */
+function getStrapiMarketData() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return axios_1.default.get(STRAPI_URL);
     });
 }
 /**
@@ -299,14 +309,30 @@ function allMarkets() {
             }
         }
     }`;
+        var metadata = [];
+        // Get markets metadata from Strapi
+        yield getStrapiMarketData().then((res) => {
+            metadata = res.data;
+        });
         var markets = [];
         yield query_subgraph(query).then((res) => {
             markets = res.data.data.fixedProductMarketMakers;
-            // Trim id of poolmembers (it's pool id + user id)
+            // Trim id of poolmembers (it's pool id + user id) and add metadata
             markets.forEach((market) => {
                 market.poolMembers.forEach(poolMember => {
                     poolMember.id = poolMember.id.slice(42);
                 });
+                let curMetadata = metadata.find(o => o.marketMakerAddress.toLowerCase() === market.id);
+                if (curMetadata) {
+                    market.question = curMetadata.question;
+                    market.outcomes = curMetadata.outcomes;
+                    market.description = curMetadata.description;
+                    market.market_type = curMetadata.market_type;
+                    if (market.market_type === 'scalar') {
+                        market.upper_bound = curMetadata.upper_bound;
+                        market.lower_bound = curMetadata.lower_bound;
+                    }
+                }
             });
         }).catch((error) => {
             console.log(error);

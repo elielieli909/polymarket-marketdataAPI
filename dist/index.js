@@ -29,14 +29,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
-// const handlers = require('./handlers');
-// import express from "express";
 const handlers = __importStar(require("./handlers"));
 const RPC_matic_1 = require("./RPC-matic");
 // Start server
 let app = express();
-// GET routes
-app.get("/allAccounts", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/allAccounts", (res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accounts = yield handlers.allAccounts();
         res.json(accounts);
@@ -48,12 +45,11 @@ app.get("/allAccounts", (req, res) => __awaiter(void 0, void 0, void 0, function
 }));
 app.get("/allTradesForUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const txs = yield handlers.allTradesForUser(userHash);
         res.json(txs);
@@ -65,12 +61,11 @@ app.get("/allTradesForUser", (req, res) => __awaiter(void 0, void 0, void 0, fun
 }));
 app.get("/allFundingActionsForUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const fundingActions = yield handlers.allFundingActionsForUser(userHash);
         res.json(fundingActions);
@@ -82,23 +77,27 @@ app.get("/allFundingActionsForUser", (req, res) => __awaiter(void 0, void 0, voi
 }));
 app.get("/fpmmPoolMembershipsForUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
-    const poolMemberships = yield handlers.fpmmPoolMembershipsForUser(userHash);
-    res.json(poolMemberships);
+    const userHash = req.query.hash.toLowerCase();
+    try {
+        const poolMemberships = yield handlers.fpmmPoolMembershipsForUser(userHash);
+        res.json(poolMemberships);
+    }
+    catch (e) {
+        res.status(500);
+        res.send("There was an issue grabbing this user's pool memberships.");
+    }
 }));
 app.get("/allPositionsOfUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.query.hash) {
-        // TODO: send an error and tell client to give us a hash as a query param
         res.status(400);
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const positions = yield handlers.allPositionsOfUser(userHash);
         res.json(positions);
@@ -131,21 +130,22 @@ app.get("/pricesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, func
     }
     var endTime;
     var startBlock, endBlock = null;
+    // If no specified end date, use now
     if (!req.query.endTime) {
-        // No specified end date, use now
         endTime = Math.floor(Date.now() / 1000);
     }
     else {
         endTime = Number(req.query.endTime);
     }
+    // default step size = 30 (Approx 1 min intervals)
     var stepSize;
     if (!req.query.stepSize) {
-        // default step size = 30 (Approx 1 min intervals)
         stepSize = 43200;
     }
     else {
         stepSize = Number(req.query.stepSize);
     }
+    // Get block numbers of requested timestamps
     try {
         startBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(Number(req.query.startTime));
         endBlock = yield RPC_matic_1.getBlockNumberAtTimestamp(endTime);
@@ -157,7 +157,7 @@ app.get("/pricesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, func
         return;
     }
     try {
-        const prices = yield handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
+        const prices = yield handlers.pricesForMarket(req.query.hash.toLowerCase(), startBlock, endBlock, stepSize);
         res.json(prices);
     }
     catch (e) {
@@ -176,24 +176,24 @@ app.get("/pricesForMarketByBlock", (req, res) => __awaiter(void 0, void 0, void 
         res.json("Need to provide a block number under a startBlock query parameter");
         return;
     }
+    // No specified end block, use now
     var endBlock = null;
     if (!req.query.endBlock) {
-        // No specified end date, use now
         endBlock = yield RPC_matic_1.getCurrentBlockNumber();
     }
     else {
         endBlock = Number(req.query.endBlock);
     }
+    // default step size = 43200 (Approx 1 day intervals, assuming block time of ~2s)
     var stepSize;
     if (!req.query.stepSize) {
-        // default step size = 43200 (Approx 1 day intervals, assuming block time of ~2s)
         stepSize = 43200;
     }
     else {
         stepSize = Number(req.query.stepSize);
     }
     try {
-        const prices = yield handlers.pricesForMarket(req.query.hash, Number(req.query.startBlock), endBlock, stepSize);
+        const prices = yield handlers.pricesForMarket(req.query.hash.toLowerCase(), Number(req.query.startBlock), endBlock, stepSize);
         res.json(prices);
     }
     catch (e) {
@@ -208,7 +208,7 @@ app.get("/allTradesForMarket", (req, res) => __awaiter(void 0, void 0, void 0, f
         return;
     }
     try {
-        const txs = yield handlers.allTradesForMarket(req.query.hash);
+        const txs = yield handlers.allTradesForMarket(req.query.hash.toLowerCase());
         res.json(txs);
     }
     catch (e) {

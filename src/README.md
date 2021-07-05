@@ -2,6 +2,8 @@
 
 Simple Typescript/Express REST API implementation
 
+Start with 'npm run start'
+
 ## index.ts
 
 Holds the server setup and routes.

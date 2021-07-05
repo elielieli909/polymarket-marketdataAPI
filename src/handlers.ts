@@ -1,10 +1,10 @@
 import Axios from "axios";
-import { start } from "repl";
 // const Axios = require("axios");
-import { Account, Transaction, FpmmPoolMembership, AccountMarketPosition, Market } from "./interfaces";
+import { Account, Transaction, FpmmPoolMembership, AccountMarketPosition, Market, MarketMetadata } from "./interfaces";
 import {getTimestampFromBlocknumber} from "./RPC-matic";
 
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading'
+const STRAPI_URL = 'https://strapi-matic.poly.market/markets'
 
 /**
  * Helper function for interacting with TheGraph via http POST
@@ -15,6 +15,14 @@ async function query_subgraph(query: string) {
     return Axios.post(SUBGRAPH_URL, {
         query: query
     });
+}
+
+/**
+ * Helper function for interacting with the Strapi API
+ * @returns a list of all markets + metadata
+ */
+async function getStrapiMarketData() {
+    return Axios.get(STRAPI_URL);
 }
 
 /**
@@ -278,18 +286,41 @@ export async function allMarkets(): Promise<Market[]> {
                 id
             }
         }
-    }`
+    }`;
+
+    // Get markets metadata from Strapi
+    var metadata: MarketMetadata[] = [];
+    await getStrapiMarketData().then((res) => {
+        metadata = res.data;
+    }).catch((error) => {
+        console.error(error);
+        throw error;
+    });
+
     var markets: Market[] = [];
     await query_subgraph(query).then((res) => {
         markets = res.data.data.fixedProductMarketMakers;
-        // Trim id of poolmembers (it's pool id + user id)
+
+        // Trim id of poolmembers (it's pool id + user id) and add metadata
         markets.forEach((market) => {
             market.poolMembers.forEach(poolMember => {
                 poolMember.id = poolMember.id.slice(42);
             });
+
+            let curMetadata = metadata.find(o => o.marketMakerAddress.toLowerCase() === market.id);
+            if (curMetadata) {
+                market.question = curMetadata.question;
+                market.outcomes = curMetadata.outcomes;
+                market.description = curMetadata.description;
+                market.market_type = curMetadata.market_type;
+                if (market.market_type === 'scalar') {
+                    market.upper_bound = curMetadata.upper_bound;
+                    market.lower_bound = curMetadata.lower_bound;
+                }
+            }
         })
     }).catch((error) => {
-        console.log(error);
+        console.error(error);
         throw error;
     });
     return markets;

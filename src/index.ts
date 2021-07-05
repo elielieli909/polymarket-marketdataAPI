@@ -1,5 +1,4 @@
 const express = require('express');
-import { start } from "repl";
 import * as handlers from "./handlers";
 import {getBlockNumberAtTimestamp, getCurrentBlockNumber} from "./RPC-matic";
 
@@ -22,7 +21,7 @@ app.get("/allTradesForUser", async (req: any, res: any) => {
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const txs = await handlers.allTradesForUser(userHash);
         res.json(txs);
@@ -38,7 +37,7 @@ app.get("/allFundingActionsForUser", async (req: any, res: any) => {
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const fundingActions = await handlers.allFundingActionsForUser(userHash);
         res.json(fundingActions);
@@ -54,7 +53,7 @@ app.get("/fpmmPoolMembershipsForUser", async (req: any, res: any) => {
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const poolMemberships = await handlers.fpmmPoolMembershipsForUser(userHash);
         res.json(poolMemberships);
@@ -71,7 +70,7 @@ app.get("/allPositionsOfUser", async (req: any, res: any) => {
         res.json("Need to provide user hash as a query param");
         return;
     }
-    const userHash = req.query.hash;
+    const userHash = req.query.hash.toLowerCase();
     try {
         const positions = await handlers.allPositionsOfUser(userHash);
         res.json(positions);
@@ -133,7 +132,7 @@ app.get("/pricesForMarket", async (req: any, res: any) => {
     }
 
     try {
-        const prices = await handlers.pricesForMarket(req.query.hash, startBlock, endBlock, stepSize);
+        const prices = await handlers.pricesForMarket(req.query.hash.toLowerCase(), startBlock, endBlock, stepSize);
         res.json(prices);
     } catch (e) {
         res.status(500);
@@ -170,7 +169,7 @@ app.get("/pricesForMarketByBlock", async (req:any, res:any) => {
     }
 
     try {
-        const prices = await handlers.pricesForMarket(req.query.hash, Number(req.query.startBlock), endBlock, stepSize);
+        const prices = await handlers.pricesForMarket(req.query.hash.toLowerCase(), Number(req.query.startBlock), endBlock, stepSize);
         res.json(prices);
     } catch (e) {
         res.status(500);
@@ -185,7 +184,7 @@ app.get("/allTradesForMarket", async (req:any, res:any) => {
         return;
     }
     try {
-        const txs = await handlers.allTradesForMarket(req.query.hash);
+        const txs = await handlers.allTradesForMarket(req.query.hash.toLowerCase());
         res.json(txs);
     } catch (e) {
         res.status(500);

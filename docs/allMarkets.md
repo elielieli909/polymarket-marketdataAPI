@@ -27,7 +27,7 @@ Query details about every Market Maker on Polymarket, live or expired
         "conditions": [
             {
                 "id": "0xfa8cc293e14872fca0c7e8b240360683e392e1d7a4b5ac7616b1f7e50c454ad2",
-                // payouts and resultionTimestamp will be null if the market hasn't yet been resolved
+                payouts and resultionTimestamp will be null if the market hasn't yet been resolved
                 "payouts": [
                     "0",
                     "1"
@@ -72,7 +72,14 @@ Query details about every Market Maker on Polymarket, live or expired
         "scaledLiquidityParameter": "0",
         "sellsQuantity": "51",
         "totalSupply": "0",
-        "tradesQuantity": "97"
+        "tradesQuantity": "97",
+        "question": "Will there be an Emergency Use Authorization (EUA) granted for a COVID-19 vaccine prior to Nov 3 2020?",
+        "outcomes": [
+            "Yes",
+            "No"
+        ],
+        "description": "This market is on if there will be an Emergency Use Authorization (EUA) granted for a COVID-19 vaccine before November 3rd, 2020. \"The Emergency Use Authorization (EUA) authority allows FDA to help strengthen the nation’s public health protections against CBRN threats by facilitating the availability and use of MCMs needed during public health emergencies.\" The market will resolve to \"Yes\" if an EUA is granted for a COVID-19 vaccine, according to this link: https://www.fda.gov/emergency-preparedness-and-response/mcm-legal-regulatory-and-policy-framework/emergency-use-authorization#covid19euas, before November 3rd, 2020 (election day). Even if the vaccine is not widely distributed by that date, if an EUA is granted, the market will resolve to \"Yes\". If no EUA is granted for a vaccine by November 3rd, 2020, the market will resolve “No”. Note, this market is only for vaccines, not general treatment. In the event of ambiguity in terms of the market outcome, the market will be resolved at the sole discretion of the Markets Integrity Committee (MIC).\n",
+        "market_type": "normal"
     },
     ...
 ]
@@ -80,6 +87,6 @@ Query details about every Market Maker on Polymarket, live or expired
 
 ## Error Response
 
-**Condition** : There was an error querying the graph.
+**Condition** : There was an error querying the graph or Strapi.
 
 **Code** : `500 INTERNAL SERVER ERROR`

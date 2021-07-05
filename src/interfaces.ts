@@ -83,4 +83,56 @@ export interface Market {
     poolMembers: {
         id: string;
     }[];
+    // Gotten from Strapi
+    question: string;
+    outcomes: string[];
+    description: string;
+    market_type: string;
+    // Only for scalar markets
+    upper_bound: string;
+    lower_bound: string;
 }
+
+export interface MarketMetadata {
+    id: number;
+    question: string;
+    conditionId: string;
+    slug: string;
+    twitter_card_image: string;
+    resolution_source: string;
+    end_date: string;
+    category: string;
+    amm_type: string;
+    liquidity: string;
+    sponsor_name: string;
+    sponsor_image: string;
+    start_date: string;
+    x_axis_value: string;
+    y_axis_value: string;
+    denomination_token: string;
+    fee: string;
+    image: string;
+    icon: string;
+    lower_bound: string;
+    upper_bound: string;
+    description: string;
+    tags: string[];
+    outcomes: string[];
+    outcomePrices: string[];
+    volume: string;
+    active: boolean;
+    market_type: string;
+    format_type: string;
+    lower_bound_date: string;
+    upper_bound_date: string;
+    closed: boolean;
+    marketMakerAddress: string;
+    created_at: string;
+    updated_at: string;
+    closed_time: string;
+    wide_format: string;
+    new: boolean;
+    sent_discord: boolean;
+    mailchimp_tag: string;
+    featured: boolean;
+  }

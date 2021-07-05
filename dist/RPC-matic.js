@@ -29,10 +29,10 @@ function getBlockNumberAtTimestamp(timestamp) {
             throw new Error(`Couldnt get block details from RPC for block number: ${cur_blocknum}`);
         }
         const matic_blocktime = 2; //second; approx
-        const now = Math.floor(Date.now() / 1000);
         // Converge on the correct block, taking smaller steps the closer we get
         var prev_blocknum = cur_blocknum;
-        while (cur_block.timestamp != timestamp) {
+        const startTime = Date.now(); // Sometimes blocknum bounces instead of converging; cap at 10 seconds
+        while (cur_block.timestamp != timestamp && Date.now() < startTime + 10000) {
             if (cur_block.timestamp > timestamp) {
                 console.log(`change: ${((Number(cur_block.timestamp) - timestamp) / matic_blocktime) * -1}`);
                 cur_blocknum = cur_blocknum - Math.floor((Number(cur_block.timestamp) - timestamp) / matic_blocktime);
