@@ -3,8 +3,9 @@ import Axios from "axios";
 import { Account, Transaction, FpmmPoolMembership, AccountMarketPosition, Market, MarketMetadata } from "./interfaces";
 import {getTimestampFromBlocknumber} from "./RPC-matic";
 
-const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading'
-const STRAPI_URL = 'https://strapi-matic.poly.market/markets'
+const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading';
+const STRAPI_URL_RESOLVED = 'https://strapi-matic.poly.market/markets';
+const STRAPI_URL_ACTIVE = 'https://strapi-matic.poly.market/markets?active=true&_limit=-1&closed=false';
 
 /**
  * Helper function for interacting with TheGraph via http POST
@@ -21,8 +22,16 @@ async function query_subgraph(query: string) {
  * Helper function for interacting with the Strapi API
  * @returns a list of all markets + metadata
  */
-async function getStrapiMarketData() {
-    return Axios.get(STRAPI_URL);
+async function getStrapiResolvedMarketData() {
+    return Axios.get(STRAPI_URL_RESOLVED);
+}
+
+/**
+ * 
+ * @returns 
+ */
+async function getStrapiActiveMarketData() {
+    return Axios.get(STRAPI_URL_ACTIVE);
 }
 
 /**
@@ -290,11 +299,14 @@ export async function allMarkets(): Promise<Market[]> {
 
     // Get markets metadata from Strapi
     var metadata: MarketMetadata[] = [];
-    await getStrapiMarketData().then((res) => {
+    await getStrapiActiveMarketData().then((res) => {
         metadata = res.data;
-    }).catch((error) => {
-        console.error(error);
-        throw error;
+        for (const meta of metadata) {
+            console.log(meta.question);
+        }
+    });
+    await getStrapiResolvedMarketData().then((res) => {
+        metadata = metadata.concat(res.data);
     });
 
     var markets: Market[] = [];

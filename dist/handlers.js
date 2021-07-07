@@ -16,7 +16,8 @@ exports.allTradesForMarket = exports.pricesForMarket = exports.allMarkets = expo
 const axios_1 = __importDefault(require("axios"));
 const RPC_matic_1 = require("./RPC-matic");
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/polymarket/polymarket-matic-trading';
-const STRAPI_URL = 'https://strapi-matic.poly.market/markets';
+const STRAPI_URL_RESOLVED = 'https://strapi-matic.poly.market/markets';
+const STRAPI_URL_ACTIVE = 'https://strapi-matic.poly.market/markets?active=true&_limit=-1&closed=false';
 /**
  * Helper function for interacting with TheGraph via http POST
  * @param query - multiline string argument containing the gql query
@@ -33,9 +34,18 @@ function query_subgraph(query) {
  * Helper function for interacting with the Strapi API
  * @returns a list of all markets + metadata
  */
-function getStrapiMarketData() {
+function getStrapiResolvedMarketData() {
     return __awaiter(this, void 0, void 0, function* () {
-        return axios_1.default.get(STRAPI_URL);
+        return axios_1.default.get(STRAPI_URL_RESOLVED);
+    });
+}
+/**
+ *
+ * @returns
+ */
+function getStrapiActiveMarketData() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return axios_1.default.get(STRAPI_URL_ACTIVE);
     });
 }
 /**
@@ -309,10 +319,16 @@ function allMarkets() {
             }
         }
     }`;
-        var metadata = [];
         // Get markets metadata from Strapi
-        yield getStrapiMarketData().then((res) => {
+        var metadata = [];
+        yield getStrapiActiveMarketData().then((res) => {
             metadata = res.data;
+            for (const meta of metadata) {
+                console.log(meta.question);
+            }
+        });
+        yield getStrapiResolvedMarketData().then((res) => {
+            metadata = metadata.concat(res.data);
         });
         var markets = [];
         yield query_subgraph(query).then((res) => {
@@ -335,7 +351,7 @@ function allMarkets() {
                 }
             });
         }).catch((error) => {
-            console.log(error);
+            console.error(error);
             throw error;
         });
         return markets;
